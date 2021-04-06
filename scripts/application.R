@@ -2,13 +2,17 @@ library(shiny)
 library(leaflet)
 library(sf)
 library(htmltools)
+library(htmlwidgets)
 
 # get out of the scripts dir
 setwd("..")
 
 # load polygons
 polys <- st_read("data/us_counties_hud_zip.geojson")
-cmap <- colorNumeric("YlOrRd", domain=polys$br0_yr2017)
+
+# color map to use
+# NA is not shown because leaflet has a bug in continuous legends in shiny output
+cmap <- colorNumeric("YlOrRd", domain=polys$br0_yr2017, na.color=rgb(0, 0, 0, 0))
 
 ui <- navbarPage("33percent",
         tabPanel("Map",
@@ -49,7 +53,7 @@ server <- function(input, output, session) {
             ) %>%
             addLegend(pal = cmap, values = ~br0_yr2017, opacity = 0.7, 
                       title = "Studio Rent in 2017",
-                      position = "bottomleft")
+                      position = "bottomleft", na.label="")
     })
 }
 
